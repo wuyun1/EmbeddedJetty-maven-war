@@ -1,11 +1,14 @@
 package com.myweb;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import javax.el.ELException;
 import java.net.URL;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -31,25 +34,22 @@ public class EmbeddedServerMain {
 
 		ProtectionDomain protectionDomain = EmbeddedServerMain.class.getProtectionDomain();
 		URL location = protectionDomain.getCodeSource().getLocation();
-
+		
 		String warFile = location.toExternalForm();
-		// System.out.println(warFile);
-		// try {
-		// System.out.println( new File( new URL(warFile).getPath()
-		// ).isDirectory() );
-		// System.out.println( new File( new URL(warFile).getPath() ).isFile()
-		// );
-		// } catch (MalformedURLException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		//
-		// } finally {
-		// System.exit(0);
-		// }
-
+//		List<String> staticResource = new ArrayList<String>();
+		
 		try {
-			if (new File(new URL(warFile).getPath()).isDirectory()){
+			File file = new File(new URL(warFile).getPath()).getAbsoluteFile();
+			System.out.println("RootPath: "+file);
+			if (file.isDirectory()){
 				warFile = "src/main/webapp";
+//				String staticResourcePath="";
+				if(new File(warFile).exists()){
+				}else{
+					warFile="";
+				}
+			}else if (!file.toString().endsWith(".war")){
+				warFile = "";
 			}else{
 				System.setProperty("org.apache.jasper.compiler.disablejsr199", "true");
 			}
@@ -68,7 +68,11 @@ public class EmbeddedServerMain {
 		String currentDir = new File(location.getPath()).getParent();
 		File workDir = new File(currentDir, "work");
 		context.setTempDirectory(workDir);
-
+//		try {
+//			context.newResource("");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		server.setHandler(context);
 		return server;
 	}
